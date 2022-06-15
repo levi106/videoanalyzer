@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "videoanalyzer"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
