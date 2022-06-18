@@ -1,4 +1,4 @@
-from typing import List, Iterator, TypeVar, Generic
+from typing import List, Iterator, TypeVar, Generic, Optional
 
 T = TypeVar('T')
 
@@ -8,7 +8,7 @@ class Node(Generic[T]):
         self._data = data
         self._children = children
 
-    def iter(self) -> Iterator['Node']:
+    def __iter__(self) -> Iterator['Node']:
         for child in self._children:
             yield child
 
@@ -28,3 +28,12 @@ class Node(Generic[T]):
 
     def add_child(self, child: 'Node') -> None:
         self._children.append(child)
+
+    def find_node(self, name: str) -> Optional['Node']:
+        if self._name == name:
+            return self
+        for child in self._children:
+            node = child.find_node(name)
+            if node != None:
+                return node
+        return None

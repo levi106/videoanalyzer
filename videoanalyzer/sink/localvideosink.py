@@ -1,5 +1,5 @@
 from ._basesink import BaseSink
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import cv2
 import os

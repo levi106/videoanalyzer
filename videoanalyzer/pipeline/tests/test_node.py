@@ -1,6 +1,6 @@
 from .._node import Node
 
-def test_node_():
+def test_node_create_valid_tree():
     root = Node("root", 0, [])
     child1_1 = Node("child1_1", 1, [])
     child1_2 = Node("child1_2", 2, [])
@@ -25,3 +25,18 @@ def test_node_():
     assert len(child1) == 0
     assert child1.name == "child1_2"
     assert child1.data == 2
+
+def test_node_find_name():
+    root = Node("root", 0, [])
+    child1_1 = Node("child1_1", 1, [])
+    child1_2 = Node("child1_2", 2, [])
+    child2_1 = Node("child2_1", 3, [])
+    root.add_child(child1_1)
+    root.add_child(child1_2)
+    child1_1.add_child(child2_1)
+    assert root.find_node("root") == root
+    assert root.find_node("child1_1") == child1_1
+    assert root.find_node("child1_2") == child1_2
+    assert root.find_node("child2_1") == child2_1
+    assert root.find_node("child2_2") == None
+    

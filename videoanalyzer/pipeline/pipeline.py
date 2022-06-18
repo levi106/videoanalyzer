@@ -2,20 +2,23 @@ import threading
 
 from ..source import BaseSource
 from ..sink import BaseSink
+from ..processor import BaseProcessor
 from ._node import Node
+from ._tree_builder import TreeBuilder
 from enum import Enum, auto
-from typing import Dict, Tuple
+from typing import Tuple, List, Any, Dict, Sequence
 
 class State(Enum):
     Running = auto()
     Stopped = auto()
 
 class Pipeline:
-    def __init__(self, source: Tuple[str,BaseSource], sinks: Dict[str,Tuple[str,BaseSink]]):
+    def __init__(self, source: Tuple[str,BaseSource], processors: Sequence[Tuple[str,str,BaseProcessor]] = [], sinks: Sequence[Tuple[str,str,BaseSink]] = []):
         self._state = State.Stopped
         self._lock = threading.Lock()
         self._source = source
         self._sinks = sinks
+        self._processors = processors
         self._build_tree()
     
     def start(self) -> None:
@@ -26,15 +29,23 @@ class Pipeline:
         self._set_state(State.Stopped)
         self._thread.join()
         self._source[1].reset()
-        for _,v in self._sinks.items():
-            v[1].reset()
+        for sink in self._sinks:
+            sink[2].reset()
 
     def _build_tree(self) -> None:
-        root = Node(self._source[0], self._source[1], [])
-        for k,v in self._sinks.items():
-            if root.name == v[0]:
-                root.add_child(Node(k, v[1], []))
-        self._tree = root
+        builder = TreeBuilder(self._source[0], self._source[1])
+        for name, parent, processor in self._processors:
+            builder.append(name, parent, processor)
+        for name, parent, sink in self._sinks:
+            builder.append(name, parent, sink)
+        self._tree = builder.root
+
+    def _process(self, node: Node, frame: Any, props: Dict[str,Any]):
+        processor: BaseProcessor = node.data
+        result = processor.process(frame, props)
+        if result is not None:
+            for child in node:
+                self._process(child, result[0], result[1])
 
     def _run(self) -> None:
         self._set_state(State.Running)
@@ -43,8 +54,7 @@ class Pipeline:
                 break
             source = self._tree.data
             frame, props = source.read()
-            for sink in iter(self._tree):
-                sink.data.write(frame=frame, props=props)
+            self._process(self._tree[0], frame, props)
 
     def _is_running(self) -> bool:
         self._lock.acquire()
