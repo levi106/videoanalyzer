@@ -6,7 +6,8 @@ from ..processor import BaseProcessor
 from ._node import Node
 from ._tree_builder import TreeBuilder
 from enum import Enum, auto
-from typing import Tuple, List, Any, Dict, Sequence
+from typing import Tuple, Any, Dict, Sequence
+from opentelemetry import trace
 
 class State(Enum):
     Running = auto()
@@ -20,6 +21,7 @@ class Pipeline:
         self._sinks = sinks
         self._processors = processors
         self._build_tree()
+        self._tracer = trace.get_tracer(__name__)
     
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, args=())
@@ -33,12 +35,13 @@ class Pipeline:
             sink[2].reset()
 
     def _build_tree(self) -> None:
-        builder = TreeBuilder(self._source[0], self._source[1])
-        for name, parent, processor in self._processors:
-            builder.append(name, parent, processor)
-        for name, parent, sink in self._sinks:
-            builder.append(name, parent, sink)
-        self._tree = builder.root
+        with self._tracer.start_as_current_span('build_tree'):
+            builder = TreeBuilder(self._source[0], self._source[1])
+            for name, parent, processor in self._processors:
+                builder.append(name, parent, processor)
+            for name, parent, sink in self._sinks:
+                builder.append(name, parent, sink)
+            self._tree = builder.root
 
     def _process(self, node: Node, frame: Any, props: Dict[str,Any]):
         processor: BaseProcessor = node.data
@@ -53,8 +56,9 @@ class Pipeline:
             if not self._is_running():
                 break
             source = self._tree.data
-            frame, props = source.read()
-            self._process(self._tree[0], frame, props)
+            with self._tracer.start_as_current_span('process_frame'): 
+                frame, props = source.read()
+                self._process(self._tree[0], frame, props)
 
     def _is_running(self) -> bool:
         self._lock.acquire()
