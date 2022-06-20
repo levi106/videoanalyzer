@@ -42,7 +42,7 @@ class Pipeline:
 
     def _process(self, node: Node, frame: Any, props: Dict[str,Any]):
         processor: BaseProcessor = node.data
-        result = processor.process(frame, props)
+        result = processor.process(frame=frame, props=props)
         if result is not None:
             for child in node:
                 self._process(child, result[0], result[1])
@@ -66,3 +66,10 @@ class Pipeline:
         self._lock.acquire()
         self._state = state
         self._lock.release()
+
+    @property
+    def state(self) -> State:
+        self._lock.acquire()
+        state = self._state
+        self._lock.release()
+        return state

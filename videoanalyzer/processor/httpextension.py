@@ -1,4 +1,28 @@
+import requests
+import time
+import cv2
+from io import BytesIO
 from ._baseprocessor import BaseProcessor
+from typing import Any, Dict, Optional, Tuple
 
 class HttpExtension(BaseProcessor):
-    pass
+    def __init__(self, url: str, max_samples_per_sec: int = -1):
+        self._url = url
+        self._max_samples_per_sec = max_samples_per_sec
+        self._start = 0.
+    
+    def process(self, frame: Any, props: Dict[str, Any]) -> Optional[Tuple[Any,Dict[str,Any]]]:
+        self._end = time.time()
+        diff = self._end - self._start
+        if self._max_samples_per_sec == -1 or diff * self._max_samples_per_sec > 1:
+            headers = {'Content-Type': 'multipart/form-data'}
+            files = {
+                'file': ('data.png', BytesIO(cv2.imencode('.png',frame)[1].tobytes()))
+            }
+            r = requests.post(self._url, data=props, files=files, headers=headers)
+            self._start = self._end
+
+        return frame, props
+
+    def reset(self) -> None:
+        self._start = 0

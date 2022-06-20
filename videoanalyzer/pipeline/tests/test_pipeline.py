@@ -1,22 +1,15 @@
 import pytest
+from unittest import mock
 
-from ..pipeline import Pipeline
+from ..pipeline import Pipeline, State
 from ...source._basesource import BaseSource
 from ...sink._basesink import BaseSink
 from ...processor._baseprocessor import BaseProcessor
-
-class TestSource(BaseSource):
-    pass
-
-class TestSink(BaseSink):
-    pass
-
-class TestProcessor(BaseProcessor):
-    pass
+from typing import Tuple, Dict, Any
 
 def test_pipeline_create():
-    source = TestSource()
-    sink = TestSink()
+    source = BaseSource()
+    sink = BaseSink()
     pipeline = Pipeline(source=('source', source), sinks=[('sink','source', sink)])
     root = pipeline._tree
     assert len(root) == 1
@@ -26,9 +19,9 @@ def test_pipeline_create():
     assert child.name == 'sink'
 
 def test_pipeline_create_with_isolated_sink():
-    source = TestSource()
-    sink1 = TestSink()
-    sink2 = TestSink()
+    source = BaseSource()
+    sink1 = BaseSink()
+    sink2 = BaseSink()
     sinks = [
         ('sink1','source',sink1),
         ('sink2','source2',sink2)
@@ -43,9 +36,9 @@ def test_pipeline_create_with_isolated_sink():
     assert len(pipeline._sinks) == 2
 
 def test_pipeline_create_with_multiple_sink():
-    source = TestSource()
-    sink1 = TestSink()
-    sink2 = TestSink()
+    source = BaseSource()
+    sink1 = BaseSink()
+    sink2 = BaseSink()
     sinks = [
         ('sink1','source',sink1),
         ('sink2','source',sink2)
@@ -63,15 +56,15 @@ def test_pipeline_create_with_multiple_sink():
     assert child.name == 'sink2'
 
 def test_pipeline_create_with_multiple_pipeline_and_sink():
-    source = TestSource()
-    processor1 = TestProcessor()
-    processor2 = TestProcessor()
+    source = BaseSource()
+    processor1 = BaseProcessor()
+    processor2 = BaseProcessor()
     processors = [
         ('processor1','source',processor1),
         ('processor2','processor1',processor2)
     ]
-    sink1 = TestSink()
-    sink2 = TestSink()
+    sink1 = BaseSink()
+    sink2 = BaseSink()
     sinks = [
         ('sink1','processor1',sink1),
         ('sink2','processor2',sink2)
@@ -94,3 +87,25 @@ def test_pipeline_create_with_multiple_pipeline_and_sink():
     child = next(it)
     assert len(child) == 0
     assert child.name == 'sink1'
+
+@mock.patch.object(BaseSource,'read')
+@mock.patch.object(BaseSink,'write')
+def test_pipeline_run_with_source_and_sink(sinkwrite_mock, sourceread_mock):
+    source = BaseSource()
+    sink = BaseSink()
+    pipeline = Pipeline(source=('source', source), sinks=[('sink','source', sink)])
+
+    def sinkwrite(*args, **kwargs):
+        pipeline.stop()
+
+    frame = b'\x00'
+    props = {'prop1': 'value1'}
+    def sourceread():
+        return frame, props
+
+    sinkwrite_mock.side_effect = sinkwrite
+    sourceread_mock.side_effect = sourceread
+    pipeline.start()
+    sinkwrite_mock.assert_called_once_with(frame,props)
+    sourceread_mock.assert_called_once()
+    assert pipeline.state == State.Stopped
