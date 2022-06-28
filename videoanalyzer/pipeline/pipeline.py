@@ -15,13 +15,13 @@ class State(Enum):
 
 class Pipeline:
     def __init__(self, source: Tuple[str,BaseSource], processors: Sequence[Tuple[str,str,BaseProcessor]] = [], sinks: Sequence[Tuple[str,str,BaseSink]] = []):
+        self._tracer = trace.get_tracer(__name__)
         self._state = State.Stopped
         self._lock = threading.Lock()
         self._source = source
         self._sinks = sinks
         self._processors = processors
         self._build_tree()
-        self._tracer = trace.get_tracer(__name__)
     
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, args=())
