@@ -1,4 +1,4 @@
-from .._node import Node
+from videoanalyzer.pipeline._node import Node
 
 def test_node_create_valid_tree():
     root = Node("root", 0, [])

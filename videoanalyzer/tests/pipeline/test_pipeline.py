@@ -1,10 +1,9 @@
-import pytest
 from unittest import mock
 
-from ..pipeline import Pipeline, State
-from ...source._basesource import BaseSource
-from ...sink._basesink import BaseSink
-from ...processor._baseprocessor import BaseProcessor
+from videoanalyzer.pipeline.pipeline import Pipeline, State
+from videoanalyzer.source._basesource import BaseSource
+from videoanalyzer.sink._basesink import BaseSink
+from videoanalyzer.processor._baseprocessor import BaseProcessor
 from typing import Tuple, Dict, Any
 
 def test_pipeline_create():

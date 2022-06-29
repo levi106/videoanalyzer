@@ -1,4 +1,4 @@
-from .._tree_builder import TreeBuilder
+from videoanalyzer.pipeline._tree_builder import TreeBuilder
 
 def test_tree_builder_add_in_order():
     builder = TreeBuilder('root', 'root')
