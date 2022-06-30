@@ -1,0 +1,18 @@
+FROM amd64/python:3.9-slim-buster as builder
+
+WORKDIR /src
+COPY . .
+RUN pip3 install setuptools wheel \
+    && cd /src/videoanalyzer \
+    && python3 setup.py bdist_wheel \
+    && cd /src/videoanalyzer-edge \
+    && python3 setup.py bdist_wheel
+
+FROM amd64/python:3.9-slim-buster
+WORKDIR /app
+COPY --from=builder /src/videoanalyzer/dist/videoanalyzer-0.0.1-py3-none-any.whl ./
+COPY --from=builder /src/videoanalyzer-edge/dist/videoanalyzer_edge-0.0.1-py3-none-any.whl ./
+RUN pip3 install videoanalyzer-0.0.1-py3-none-any.whl \
+    && pip3 install videoanalyzer_edge-0.0.1-py3-none-any.whl
+
+CMD [ "videoanalyzer-edge" ]
