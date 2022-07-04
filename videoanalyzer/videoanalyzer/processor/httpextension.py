@@ -1,3 +1,4 @@
+import json
 import requests
 import time
 import cv2
@@ -20,12 +21,12 @@ class HttpExtension(BaseProcessor):
             self._end = time.time()
             diff = self._end - self._start
             if self._max_samples_per_sec == -1 or diff * self._max_samples_per_sec > 1:
-                headers = {'Content-Type': 'multipart/form-data'}
                 files = {
-                    'file': ('data.png', BytesIO(cv2.imencode('.png',frame)[1].tobytes()))
+                    'file': ('frame.png', BytesIO(cv2.imencode('.png',frame)[1].tobytes()))
                 }
                 try:
-                    r = requests.post(self._url, data=props, files=files, headers=headers)
+                    r = requests.post(self._url, data={'data': json.dumps(props)}, files=files)
+                    props.update(r.json())
                 except Exception as e:
                     self._logger.exception(e)
                 self._start = self._end

@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 fastapi = "*"
+python-multipart = "*"
 uvicorn = {extras = ["standard"], version = "*"}
 opencv-python = "*"
 opentelemetry-api = "*"
