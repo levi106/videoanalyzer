@@ -34,6 +34,7 @@ class Pipeline:
     TOPOLOGY_KEY_TYPE = '@type'
     TOPOLOGY_KEY_INPUT = 'input'
     TOPOLOGY_KEY_NODENAME = 'nodeName'
+    TOPOLOGY_KEY_PARAMETERS = 'parameters'
 
     def __init__(self, source: Tuple[str,BaseSource], processors: Sequence[Tuple[str,str,BaseProcessor]] = [], sinks: Sequence[Tuple[str,str,BaseSink]] = [], name: str = ""):
         self._tracer = trace.get_tracer(__name__)
@@ -105,11 +106,12 @@ class Pipeline:
         name = type_info[cls.TOPOLOGY_KEY_NAME]
         type_name = type_info[cls.TOPOLOGY_KEY_TYPE]
         constructor = _get_class(type_name)
+        params = type_info.get(cls.TOPOLOGY_KEY_PARAMETERS, {})
         if cls.TOPOLOGY_KEY_INPUT in type_info:
             upper = type_info[cls.TOPOLOGY_KEY_INPUT][cls.TOPOLOGY_KEY_NODENAME]
-            return name, upper, constructor()
+            return name, upper, constructor(**params)
         else:
-            return name, constructor()
+            return name, constructor(**params)
 
     @classmethod
     def create_from_json(cls, jsonData:str) -> 'Pipeline':

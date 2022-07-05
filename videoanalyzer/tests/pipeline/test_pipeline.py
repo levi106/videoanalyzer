@@ -8,6 +8,8 @@ from videoanalyzer.sink._basesink import BaseSink
 from videoanalyzer.processor._baseprocessor import BaseProcessor
 from typing import Tuple, Dict, Any
 
+from videoanalyzer.source.rtspsource import RtspSource
+
 def test_pipeline_create():
     source = BaseSource()
     sink = BaseSink()
@@ -147,6 +149,57 @@ def test_pipeline_create_from_json():
     root = pipeline._tree
     assert root.name == 'source'
     assert type(root.data) is BaseSource
+    assert len(root) == 1
+    it = iter(root)
+    child = next(it)
+    assert child.name == 'processor'
+    assert type(child.data) is BaseProcessor
+    assert len(child) == 1
+    it = iter(child)
+    child = next(it)
+    assert child.name == 'sink'
+    assert type(child.data) is BaseSink
+    assert len(child) == 0
+
+def test_pipeline_create_from_json_with_param():
+    jsonData = """
+{
+    "name": "TestPipeline1",
+    "@apiVersion": "1.0",
+    "properties": {
+        "source": {
+            "@type": "videoanalyzer.source.RtspSource",
+            "name": "source",
+            "parameters": {
+                "url": "http://localhost"
+            }  
+        },
+        "processors": [
+            {
+                "@type": "videoanalyzer.processor._baseprocessor.BaseProcessor",
+                "name": "processor",
+                "input": {
+                    "nodeName": "source"
+                }
+            }
+        ],
+        "sinks": [
+            {
+                "@type": "videoanalyzer.sink._basesink.BaseSink",
+                "name": "sink",
+                "input": {
+                    "nodeName": "processor"
+                }
+            }
+        ]
+    }
+}
+"""
+    pipeline = Pipeline.create_from_json(jsonData)
+
+    root = pipeline._tree
+    assert root.name == 'source'
+    assert type(root.data) is RtspSource
     assert len(root) == 1
     it = iter(root)
     child = next(it)
