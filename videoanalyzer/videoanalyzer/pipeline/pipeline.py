@@ -1,10 +1,12 @@
+from importlib import import_module
+import json
 import threading
 
 from ..source import BaseSource
 from ..sink import BaseSink
 from ..processor import BaseProcessor
 from ._node import Node
-from ._tree_builder import TreeBuilder
+from ._treebuilder import TreeBuilder
 from enum import Enum, auto
 from typing import Tuple, Any, Dict, Sequence
 from opentelemetry import trace
@@ -13,14 +15,34 @@ class State(Enum):
     Running = auto()
     Stopped = auto()
 
+def _get_class(type: str):
+    try:
+        module_name, class_name = type.rsplit('.', 1)
+        module = import_module(module_name)
+        return getattr(module, class_name)
+    except (ImportError, AttributeError):
+        raise ImportError(type)
+
 class Pipeline:
-    def __init__(self, source: Tuple[str,BaseSource], processors: Sequence[Tuple[str,str,BaseProcessor]] = [], sinks: Sequence[Tuple[str,str,BaseSink]] = []):
+    API_VERSION = '1.0'
+    TOPOLOGY_KEY_NAME = 'name'
+    TOPOLOGY_KEY_APIVERSION = '@apiVersion'
+    TOPOLOGY_KEY_PROPERTIES = 'properties'
+    TOPOLOGY_KEY_SOURCE = 'source'
+    TOPOLOGY_KEY_SINKS = 'sinks'
+    TOPOLOGY_KEY_PROCESSORS = 'processors'
+    TOPOLOGY_KEY_TYPE = '@type'
+    TOPOLOGY_KEY_INPUT = 'input'
+    TOPOLOGY_KEY_NODENAME = 'nodeName'
+
+    def __init__(self, source: Tuple[str,BaseSource], processors: Sequence[Tuple[str,str,BaseProcessor]] = [], sinks: Sequence[Tuple[str,str,BaseSink]] = [], name: str = ""):
         self._tracer = trace.get_tracer(__name__)
         self._state = State.Stopped
         self._lock = threading.Lock()
         self._source = source
         self._sinks = sinks
         self._processors = processors
+        self._name = name
         self._build_tree()
     
     def start(self) -> None:
@@ -77,3 +99,28 @@ class Pipeline:
         state = self._state
         self._lock.release()
         return state
+
+    @classmethod
+    def _create_instance(cls, type_info: Dict[str,Any]) -> Any:
+        name = type_info[cls.TOPOLOGY_KEY_NAME]
+        type_name = type_info[cls.TOPOLOGY_KEY_TYPE]
+        constructor = _get_class(type_name)
+        if cls.TOPOLOGY_KEY_INPUT in type_info:
+            upper = type_info[cls.TOPOLOGY_KEY_INPUT][cls.TOPOLOGY_KEY_NODENAME]
+            return name, upper, constructor()
+        else:
+            return name, constructor()
+
+    @classmethod
+    def create_from_json(cls, jsonData:str) -> 'Pipeline':
+        topology = json.loads(jsonData)
+        name = topology[cls.TOPOLOGY_KEY_NAME]
+        apiVersion = topology[cls.TOPOLOGY_KEY_APIVERSION]
+        if apiVersion != cls.API_VERSION:
+            raise Exception('Invalid API version {}'.format(apiVersion))
+        properties = topology[cls.TOPOLOGY_KEY_PROPERTIES]
+        source = cls._create_instance(properties[cls.TOPOLOGY_KEY_SOURCE])
+        processors = [cls._create_instance(processor) for processor in properties[cls.TOPOLOGY_KEY_PROCESSORS]]
+        sinks = [cls._create_instance(sink) for sink in properties[cls.TOPOLOGY_KEY_SINKS]]
+
+        return cls(source=source, processors=processors, sinks=sinks, name=name)

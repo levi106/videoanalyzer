@@ -1,5 +1,7 @@
 from unittest import mock
 
+import pytest
+
 from videoanalyzer.pipeline.pipeline import Pipeline, State
 from videoanalyzer.source._basesource import BaseSource
 from videoanalyzer.sink._basesink import BaseSink
@@ -108,3 +110,102 @@ def test_pipeline_run_with_source_and_sink(sinkwrite_mock, sourceread_mock):
     sinkwrite_mock.assert_called_once_with(frame,props)
     sourceread_mock.assert_called_once()
     assert pipeline.state == State.Stopped
+
+def test_pipeline_create_from_json():
+    jsonData = """
+{
+    "name": "TestPipeline1",
+    "@apiVersion": "1.0",
+    "properties": {
+        "source": {
+            "@type": "videoanalyzer.source._basesource.BaseSource",
+            "name": "source"            
+        },
+        "processors": [
+            {
+                "@type": "videoanalyzer.processor._baseprocessor.BaseProcessor",
+                "name": "processor",
+                "input": {
+                    "nodeName": "source"
+                }
+            }
+        ],
+        "sinks": [
+            {
+                "@type": "videoanalyzer.sink._basesink.BaseSink",
+                "name": "sink",
+                "input": {
+                    "nodeName": "processor"
+                }
+            }
+        ]
+    }
+}
+"""
+    pipeline = Pipeline.create_from_json(jsonData)
+
+    root = pipeline._tree
+    assert root.name == 'source'
+    assert type(root.data) is BaseSource
+    assert len(root) == 1
+    it = iter(root)
+    child = next(it)
+    assert child.name == 'processor'
+    assert type(child.data) is BaseProcessor
+    assert len(child) == 1
+    it = iter(child)
+    child = next(it)
+    assert child.name == 'sink'
+    assert type(child.data) is BaseSink
+    assert len(child) == 0
+
+def test_pipeline_create_from_json_raise_exception_if_json_has_invalid_api_version():
+    jsonData = """
+{
+    "name": "TestPipeline1",
+    "@apiVersion": "0.0",
+    "properties": {
+        "source": {
+            "@type": "videoanalyzer.source._basesource.BaseSource",
+            "name": "source"            
+        },
+        "sinks": [
+            {
+                "@type": "videoanalyzer.sink._basesink.BaseSink",
+                "name": "sink",
+                "input": {
+                    "nodeName": "source"
+                }
+            }
+        ]
+    }
+}
+"""
+    with pytest.raises(Exception) as e:
+        _ = Pipeline.create_from_json(jsonData)
+    assert str(e.value) == 'Invalid API version 0.0'
+
+def test_pipeline_create_from_json_raise_exception_if_name_does_not_exist():
+    jsonData = """
+{
+    "@apiVersion": "1.0",
+    "properties": {
+        "source": {
+            "@type": "videoanalyzer.source._basesource.BaseSource",
+            "name": "source"            
+        },
+        "sinks": [
+            {
+                "@type": "videoanalyzer.sink._basesink.BaseSink",
+                "name": "sink",
+                "input": {
+                    "nodeName": "source"
+                }
+            }
+        ]
+    }
+}
+"""
+    with pytest.raises(KeyError) as e:
+        _ = Pipeline.create_from_json(jsonData)
+    assert str(e.value) == "'name'"
