@@ -14,6 +14,7 @@ videoanalyzer = {editable = true, path = "."}
 
 [dev-packages]
 mypy = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.8"
