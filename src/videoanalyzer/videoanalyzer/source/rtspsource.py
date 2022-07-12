@@ -3,6 +3,7 @@ from .opencvsource import OpenCvSource
 
 import cv2
 
+
 class RtspSource(OpenCvSource):
     def __init__(self, url: str):
         super().__init__()

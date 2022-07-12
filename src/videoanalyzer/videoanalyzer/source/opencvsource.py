@@ -4,6 +4,7 @@ from opentelemetry import trace
 
 import cv2
 
+
 class OpenCvSource(BaseSource):
     def __init__(self):
         self._cap: Any = None
@@ -43,4 +44,3 @@ class OpenCvSource(BaseSource):
         if self._cap != None:
             self._cap.release()
             self._cap = None
-

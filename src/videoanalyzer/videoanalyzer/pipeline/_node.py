@@ -2,6 +2,7 @@ from typing import List, Iterator, TypeVar, Generic, Optional
 
 T = TypeVar('T')
 
+
 class Node(Generic[T]):
     def __init__(self, name: str, data: T, children: List['Node']):
         self._name = name

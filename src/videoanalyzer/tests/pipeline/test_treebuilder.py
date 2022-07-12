@@ -1,5 +1,6 @@
 from videoanalyzer.pipeline._treebuilder import TreeBuilder
 
+
 def test_tree_builder_add_in_order():
     builder = TreeBuilder('root', 'root')
     builder.append('child1', 'root', 'child1')
@@ -15,6 +16,7 @@ def test_tree_builder_add_in_order():
     assert len(child) == 0
     assert len(builder._tmp_nodes) == 0
 
+
 def test_tree_builder_add_in_reverse_order():
     builder = TreeBuilder('root', 'root')
     builder.append('child2', 'child1', 'child2')
@@ -29,6 +31,7 @@ def test_tree_builder_add_in_reverse_order():
     assert child.name == 'child2'
     assert len(child) == 0
     assert len(builder._tmp_nodes) == 0
+
 
 def test_tree_builder_has_branch():
     builder = TreeBuilder('root', 'root')

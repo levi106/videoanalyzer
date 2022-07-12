@@ -15,6 +15,13 @@ videoanalyzer = {editable = true, path = "."}
 [dev-packages]
 mypy = "*"
 pytest = "*"
+flake8 = "*"
+autopep8 = "*"
+flake8-import-order = "*"
+
+[scripts]
+lint = "flake8 --show-source ."
+format = "autopep8 -ivr ."
 
 [requires]
 python_version = "3.8"

@@ -10,9 +10,11 @@ from opentelemetry.sdk.trace.export import (
     SimpleSpanProcessor
 )
 
+
 def main():
     trace.set_tracer_provider(TracerProvider())
-    provider: TracerProvider = cast(TracerProvider, trace.get_tracer_provider())
+    provider: TracerProvider = cast(
+        TracerProvider, trace.get_tracer_provider())
     provider.add_span_processor(
         SimpleSpanProcessor(ConsoleSpanExporter())
     )
@@ -25,6 +27,7 @@ def main():
     pipeline.start()
     time.sleep(5)
     pipeline.stop()
+
 
 if __name__ == "__main__":
     main()

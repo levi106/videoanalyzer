@@ -2,12 +2,13 @@ from ._baseprocessor import BaseProcessor
 from typing import Any, Dict, Optional, Tuple, cast
 from opentelemetry import trace
 
+
 class SignalProcessor(BaseProcessor):
     def __init__(self):
         self._is_open = False
         self._tracer = trace.get_tracer(__name__)
 
-    def process(self, frame: Any, props: Dict[str, Any]) -> Optional[Tuple[Any,Dict[str,Any]]]:
+    def process(self, frame: Any, props: Dict[str, Any]) -> Optional[Tuple[Any, Dict[str, Any]]]:
         with self._tracer.start_as_current_span('process'):
             if 'gate' in props:
                 state: str = cast(str, props['__gate']).lower()

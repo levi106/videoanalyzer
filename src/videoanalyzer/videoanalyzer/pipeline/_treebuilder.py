@@ -1,10 +1,11 @@
 from ._node import Node
 from typing import Tuple, List, Any
 
+
 class TreeBuilder:
     def __init__(self, name: str, data: Any):
         self._root = Node(name, data, [])
-        self._tmp_nodes: List[Tuple[str,Node]] = []
+        self._tmp_nodes: List[Tuple[str, Node]] = []
 
     def append(self, name: str, parent: str, data: Any) -> None:
         node = Node(name, data, [])
@@ -24,7 +25,7 @@ class TreeBuilder:
                     found = True
                     break
             if not found:
-                self._tmp_nodes.append((parent,node))
+                self._tmp_nodes.append((parent, node))
 
     @property
     def root(self) -> Node:

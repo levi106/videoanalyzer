@@ -1,5 +1,6 @@
 from videoanalyzer.pipeline._node import Node
 
+
 def test_node_create_valid_tree():
     root = Node("root", 0, [])
     child1_1 = Node("child1_1", 1, [])
@@ -26,6 +27,7 @@ def test_node_create_valid_tree():
     assert child1.name == "child1_2"
     assert child1.data == 2
 
+
 def test_node_find_name():
     root = Node("root", 0, [])
     child1_1 = Node("child1_1", 1, [])
@@ -39,4 +41,3 @@ def test_node_find_name():
     assert root.find_node("child1_2") == child1_2
     assert root.find_node("child2_1") == child2_1
     assert root.find_node("child2_2") == None
-    
