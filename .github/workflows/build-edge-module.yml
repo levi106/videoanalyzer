@@ -54,6 +54,25 @@ jobs:
     - name: Run Test
       run: pipenv run pytest tests
       working-directory: ./src/videoanalyzer
+      
+    - name: Run linter
+      run: pipenv run lint
+      working-directory: ./src/videoanalyzer
+      
+    - name: Run formatting check
+      run: pipenv run format --check
+      working-directory: ./src/videoanalyzer
+      
+    - name: Setup node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: "12"
+        
+    - name: Run type checking
+      run: |
+        npm install -g pyright
+        pipenv run typecheck
+      working-directory: ./src/videoanalyzer
     
   build-and-push-image:
     runs-on: ubuntu-latest
