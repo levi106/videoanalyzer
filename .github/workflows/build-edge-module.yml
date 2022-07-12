@@ -52,11 +52,13 @@ jobs:
       working-directory: ./src/videoanalyzer
       
     - name: Run Test
-      run: pipenv run test
+      run: pipenv run pytest tests
       working-directory: ./src/videoanalyzer
     
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: pytest
+    if: ${{ success() }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
