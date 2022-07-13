@@ -59,10 +59,6 @@ jobs:
       run: pipenv run lint
       working-directory: ./src/videoanalyzer
       
-    - name: Run formatting check
-      run: pipenv run format --check
-      working-directory: ./src/videoanalyzer
-      
     - name: Setup node.js
       uses: actions/setup-node@v1
       with:
