@@ -59,15 +59,8 @@ jobs:
       run: pipenv run lint
       working-directory: ./src/videoanalyzer
       
-    - name: Setup node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: "12"
-        
     - name: Run type checking
-      run: |
-        npm install -g pyright
-        pipenv run typecheck
+      run: pipenv run pyright
       working-directory: ./src/videoanalyzer
     
   build-and-push-image:

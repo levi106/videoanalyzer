@@ -1,3 +1,3 @@
-from .pipeline import Pipeline
+from .pipeline import Pipeline, State
 
-__all__ = ['Pipeline', 'State', 'PipelineBuilder']
+__all__ = ['Pipeline', 'State']
