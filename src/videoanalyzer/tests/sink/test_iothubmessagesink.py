@@ -1,7 +1,9 @@
 import json
 from unittest import mock
-from videoanalyzer.sink.iothubmessagesink import IoTHubMessageSink
+
 from azure.iot.device import IoTHubModuleClient
+
+from videoanalyzer.sink.iothubmessagesink import IoTHubMessageSink
 
 
 @mock.patch('azure.iot.device.IoTHubModuleClient.__new__')

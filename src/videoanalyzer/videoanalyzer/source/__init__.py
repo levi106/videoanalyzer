@@ -1,5 +1,5 @@
 from ._basesource import BaseSource
-from .rtspsource import RtspSource
 from .camerasource import CameraSource
+from .rtspsource import RtspSource
 
-__all__ = ['BaseSource', 'RtspSource', 'CameraSource']
+__all__ = ['BaseSource', 'CameraSource', 'RtspSource']

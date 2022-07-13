@@ -1,5 +1,6 @@
-from ._baseprocessor import BaseProcessor
 from typing import Any, Dict, Optional, Tuple
+
+from ._baseprocessor import BaseProcessor
 
 
 class NullProcessor(BaseProcessor):

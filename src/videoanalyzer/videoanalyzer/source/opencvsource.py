@@ -1,8 +1,10 @@
 from typing import Any, Dict, Tuple
-from ._basesource import BaseSource
-from opentelemetry import trace
 
 import cv2
+
+from opentelemetry import trace
+
+from ._basesource import BaseSource
 
 
 class OpenCvSource(BaseSource):
@@ -15,7 +17,7 @@ class OpenCvSource(BaseSource):
 
     def read(self) -> Tuple[Any, Dict[str, Any]]:
         with self._tracer.start_as_current_span('read'):
-            if self._cap == None:
+            if self._cap is None:
                 self._cap = self._create_device()
                 self._width = self._cap.get(cv2.CAP_PROP_FRAME_WIDTH)
                 self._height = self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -41,6 +43,6 @@ class OpenCvSource(BaseSource):
             return frame, props
 
     def reset(self) -> None:
-        if self._cap != None:
+        if self._cap is not None:
             self._cap.release()
             self._cap = None

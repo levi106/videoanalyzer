@@ -1,5 +1,6 @@
+from typing import Any, List, Tuple
+
 from ._node import Node
-from typing import Tuple, List, Any
 
 
 class TreeBuilder:

@@ -1,12 +1,16 @@
 import json
-import requests
 import time
-import cv2
 from io import BytesIO
-from ._baseprocessor import BaseProcessor
-from typing import Any, Dict, Optional, Tuple
-from opentelemetry import trace
 from logging import getLogger
+from typing import Any, Dict, Optional, Tuple
+
+import cv2
+
+from opentelemetry import trace
+
+import requests
+
+from ._baseprocessor import BaseProcessor
 
 
 class HttpExtension(BaseProcessor):

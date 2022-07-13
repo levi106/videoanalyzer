@@ -20,7 +20,7 @@ autopep8 = "*"
 flake8-import-order = "*"
 
 [scripts]
-lint = "flake8 --show-source ."
+lint = "flake8 --ignore=E501 --show-source ."
 format = "autopep8 -ivr ."
 
 [requires]

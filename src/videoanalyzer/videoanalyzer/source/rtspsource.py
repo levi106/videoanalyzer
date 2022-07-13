@@ -1,7 +1,8 @@
 from typing import Any
-from .opencvsource import OpenCvSource
 
 import cv2
+
+from .opencvsource import OpenCvSource
 
 
 class RtspSource(OpenCvSource):

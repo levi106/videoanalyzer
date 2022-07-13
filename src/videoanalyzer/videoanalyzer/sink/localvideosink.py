@@ -1,14 +1,16 @@
-from ._basesink import BaseSink
+import datetime
+import os
 from typing import Any, Dict
-from opentelemetry import trace
 
 import cv2
-import os
-import datetime
+
+from opentelemetry import trace
+
+from ._basesink import BaseSink
 
 
 class LocalVideoSink(BaseSink):
-    def __init__(self,  output_dir: str):
+    def __init__(self, output_dir: str):
         self._output_dir = output_dir
         self._writer: Any = None
         self._fourcc = cv2.VideoWriter_fourcc(*'X264')
@@ -16,7 +18,7 @@ class LocalVideoSink(BaseSink):
 
     def write(self, frame: Any, props: Dict[str, Any]) -> None:
         with self._tracer.start_as_current_span('write'):
-            if self._writer == None:
+            if self._writer is None:
                 now = datetime.datetime.now()
                 filename = os.path.join(
                     self._output_dir, now.strftime('%Y%m%d%H%M%S.mkv'))

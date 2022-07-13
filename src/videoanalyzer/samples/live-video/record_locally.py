@@ -1,14 +1,16 @@
 import time
-from videoanalyzer.source import CameraSource
-from videoanalyzer.sink import LocalVideoSink
-from videoanalyzer.pipeline import Pipeline
 from typing import cast
+
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
     ConsoleSpanExporter,
     SimpleSpanProcessor
 )
+
+from videoanalyzer.pipeline import Pipeline
+from videoanalyzer.sink import LocalVideoSink
+from videoanalyzer.source import CameraSource
 
 
 def main():

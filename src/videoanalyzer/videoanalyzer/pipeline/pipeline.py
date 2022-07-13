@@ -1,15 +1,16 @@
-from importlib import import_module
 import json
 import threading
+from enum import Enum, auto
+from importlib import import_module
+from typing import Any, Dict, Sequence, Tuple
 
-from ..source import BaseSource
-from ..sink import BaseSink
-from ..processor import BaseProcessor
+from opentelemetry import trace
+
 from ._node import Node
 from ._treebuilder import TreeBuilder
-from enum import Enum, auto
-from typing import Tuple, Any, Dict, Sequence
-from opentelemetry import trace
+from ..processor import BaseProcessor
+from ..sink import BaseSink
+from ..source import BaseSource
 
 
 class State(Enum):

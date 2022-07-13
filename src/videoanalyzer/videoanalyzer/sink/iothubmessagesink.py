@@ -1,8 +1,11 @@
 import json
-from ._basesink import BaseSink
-from azure.iot.device import IoTHubModuleClient
 from typing import Any, Dict
+
+from azure.iot.device import IoTHubModuleClient
+
 from opentelemetry import trace
+
+from ._basesink import BaseSink
 
 
 class IoTHubMessageSink(BaseSink):

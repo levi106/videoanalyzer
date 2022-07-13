@@ -1,6 +1,8 @@
-from ._baseprocessor import BaseProcessor
 from typing import Any, Dict, Optional, Tuple, cast
+
 from opentelemetry import trace
+
+from ._baseprocessor import BaseProcessor
 
 
 class SignalProcessor(BaseProcessor):

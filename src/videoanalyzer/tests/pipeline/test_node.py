@@ -40,4 +40,4 @@ def test_node_find_name():
     assert root.find_node("child1_1") == child1_1
     assert root.find_node("child1_2") == child1_2
     assert root.find_node("child2_1") == child2_1
-    assert root.find_node("child2_2") == None
+    assert root.find_node("child2_2") is None

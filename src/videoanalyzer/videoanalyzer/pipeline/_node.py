@@ -1,4 +1,4 @@
-from typing import List, Iterator, TypeVar, Generic, Optional
+from typing import Generic, Iterator, List, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -35,6 +35,6 @@ class Node(Generic[T]):
             return self
         for child in self._children:
             node = child.find_node(name)
-            if node != None:
+            if node is not None:
                 return node
         return None

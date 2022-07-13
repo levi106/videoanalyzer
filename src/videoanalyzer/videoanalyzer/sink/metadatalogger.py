@@ -1,8 +1,10 @@
 import json
 from logging import getLogger
-from ._basesink import BaseSink
 from typing import Any, Dict
+
 from opentelemetry import trace
+
+from ._basesink import BaseSink
 
 
 class MetadataLogger(BaseSink):

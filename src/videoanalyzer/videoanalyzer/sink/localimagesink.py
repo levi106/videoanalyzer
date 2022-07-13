@@ -1,11 +1,13 @@
 import time
-from ._basesink import BaseSink
 from typing import Any, Dict
+
 from opentelemetry import trace
+
+from ._basesink import BaseSink
 
 
 class LocalImageSink(BaseSink):
-    def __init__(self,  output_dir: str, max_samples_per_sec: int = -1):
+    def __init__(self, output_dir: str, max_samples_per_sec: int = -1):
         self._output_dir = output_dir
         self._max_samples_per_sec = max_samples_per_sec
         self._start = 0.

@@ -3,11 +3,9 @@ from unittest import mock
 import pytest
 
 from videoanalyzer.pipeline.pipeline import Pipeline, State
-from videoanalyzer.source._basesource import BaseSource
-from videoanalyzer.sink._basesink import BaseSink
 from videoanalyzer.processor._baseprocessor import BaseProcessor
-from typing import Tuple, Dict, Any
-
+from videoanalyzer.sink._basesink import BaseSink
+from videoanalyzer.source._basesource import BaseSource
 from videoanalyzer.source.rtspsource import RtspSource
 
 
@@ -131,7 +129,7 @@ def test_pipeline_create_from_json():
     "properties": {
         "source": {
             "@type": "videoanalyzer.source._basesource.BaseSource",
-            "name": "source"            
+            "name": "source"
         },
         "processors": [
             {
@@ -183,7 +181,7 @@ def test_pipeline_create_from_json_with_param():
             "name": "source",
             "parameters": {
                 "url": "http://localhost"
-            }  
+            }
         },
         "processors": [
             {
@@ -232,7 +230,7 @@ def test_pipeline_create_from_json_raise_exception_if_json_has_invalid_api_versi
     "properties": {
         "source": {
             "@type": "videoanalyzer.source._basesource.BaseSource",
-            "name": "source"            
+            "name": "source"
         },
         "sinks": [
             {
@@ -258,7 +256,7 @@ def test_pipeline_create_from_json_raise_exception_if_name_does_not_exist():
     "properties": {
         "source": {
             "@type": "videoanalyzer.source._basesource.BaseSource",
-            "name": "source"            
+            "name": "source"
         },
         "sinks": [
             {
