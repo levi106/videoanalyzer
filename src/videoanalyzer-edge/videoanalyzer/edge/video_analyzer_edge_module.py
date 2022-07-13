@@ -7,6 +7,7 @@ from azure.iot.device.aio import IoTHubModuleClient
 
 logger = logging.getLogger(__name__)
 
+
 class VideoAnalyzerEdgeModule():
     METHOD_NAME_ACTIVATE = "activate"
     METHOD_NAME_DEACTIVATE = "deactivate"
@@ -38,7 +39,7 @@ class VideoAnalyzerEdgeModule():
             logger.exception('%s', e)
             client.shutdown()
             raise
-        
+
         return client
 
     async def run(self) -> None:

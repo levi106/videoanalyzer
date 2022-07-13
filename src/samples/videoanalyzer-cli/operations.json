@@ -1,0 +1,35 @@
+{
+    "apiVersion": "1.1",
+    "operations": [
+        {
+            "opName": "setPipeline",
+            "opParams": {
+                "pipelineTopologyFile": "topology.json"
+            }
+        },
+        {
+            "opName": "activate",
+            "opParams": {}
+        },
+        {
+            "opName": "WaitForInput",
+            "opParams": {
+                "message": "The livePipeline has been activated. Press Enter to continue and deactivate the livePipeline."
+            }
+        },
+        {
+            "opName": "deactivate",
+            "opParams": {}
+        },
+        {
+            "opName": "WaitForInput",
+            "opParams": {
+                "message": "Press Enter to continue"
+            }
+        },
+        {
+            "opName": "deletePipeline",
+            "opParams": {}
+        }
+    ]
+}

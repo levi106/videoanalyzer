@@ -4,11 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-videoanalyzer = {editable = true, path = "./../videoanalyzer"}
+videoanalyzer-cli = {editable = true, path = "."}
 
 [dev-packages]
 mypy = "*"
-pytest = "*"
 flake8 = "*"
 pyright = "*"
 

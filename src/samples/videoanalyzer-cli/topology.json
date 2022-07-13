@@ -1,0 +1,32 @@
+{
+    "name": "Simple-Pipeline-1",
+    "@apiVersion": "1.0",
+    "properties": {
+        "source": {
+            "@type": "videoanalyzer.source.RtspSource",
+            "name": "source",
+            "parameters": {
+                "url": "rtsp://rtspsim:554/media/camera-300s.mkv"
+            }
+        },
+        "processors": [
+            {
+                "@type": "videoanalyzer.processor.NullProcessor",
+                "name": "null",
+                "input": {
+                    "nodeName": "source"
+                }
+            }
+        ],
+        "sinks": {
+            "@type": "videoanalyzer.sink.LocalVideoSink",
+            "name": "file",
+            "input": {
+                "nodeName": "null"
+            },
+            "parameters": {
+                "output_dir": "/tmp/"
+            }
+        }
+    }
+}
