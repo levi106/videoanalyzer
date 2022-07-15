@@ -7,9 +7,6 @@ name = "pypi"
 fastapi = "*"
 python-multipart = "*"
 uvicorn = {extras = ["standard"], version = "*"}
-opencv-python = "*"
-opentelemetry-api = "*"
-opentelemetry-sdk = "*"
 videoanalyzer = {editable = true, path = "."}
 
 [dev-packages]
