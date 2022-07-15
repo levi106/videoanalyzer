@@ -20,6 +20,7 @@ class VideoAnalyzerEdgeModule():
         pass
 
     def create_client(self) -> IoTHubModuleClient:
+        logger.info('create_client')
         client = cast(IoTHubModuleClient, IoTHubModuleClient.create_from_edge_environment())
 
         async def _message_handler(message) -> None:
@@ -43,15 +44,16 @@ class VideoAnalyzerEdgeModule():
         return client
 
     async def run(self) -> None:
+        logger.info('run')
         while not self._stop_event.is_set():
             await asyncio.sleep(1000)
 
     async def message_handler(self, message) -> None:
-        logger.debug('message_handler')
+        logger.info('message_handler')
         pass
 
     async def method_handler(self, method_request: MethodRequest) -> None:
-        logger.debug(f'method_handler: {method_request.name}')
+        logger.info(f'method_handler: {method_request.name}')
         if method_request.name == self.METHOD_NAME_ACTIVATE:
             pass
         elif method_request.name == self.METHOD_NAME_DEACTIVATE:
@@ -68,11 +70,13 @@ class VideoAnalyzerEdgeModule():
         await self._client.send_method_response(method_response)
 
     async def twin_patch_handler(self, twin_patch) -> None:
-        logger.debug('twin_patch_handler')
+        logger.info('twin_patch_handler')
         pass
 
     def terminate(self) -> None:
+        logger.info('terminate')
         self._stop_event.set()
 
     async def shutdown(self) -> None:
+        logger.info('shutdown')
         await self._client.shutdown()

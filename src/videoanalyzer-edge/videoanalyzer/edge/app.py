@@ -1,10 +1,12 @@
 import asyncio
+import logging
 import signal
 
 from .video_analyzer_edge_module import VideoAnalyzerEdgeModule
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO)
     module = VideoAnalyzerEdgeModule()
 
     def module_termination_handler_(signal, frame) -> None:
