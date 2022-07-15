@@ -57,18 +57,30 @@ class VideoAnalyzerEdgeModule():
     def _handle_activate(self, method_request: MethodRequest) -> None:
         if self._pipeline is not None:
             if self._pipeline.state is State.Stopped:
-                self._pipeline.start()
+                try:
+                    self._pipeline.start()
+                except Exception as e:
+                    logger.exception('%s', e)
+                    raise
 
     def _handle_deactivate(self, method_request: MethodRequest) -> None:
         if self._pipeline is not None:
             if self._pipeline.state is State.Running:
-                self._pipeline.stop()
+                try:
+                    self._pipeline.stop()
+                except Exception as e:
+                    logger.exception('%s', e)
+                    raise
 
     def _handle_set_pipeline(self, method_request: MethodRequest) -> None:
         jsonData = method_request.payload
         logger.info(f'{jsonData}')
         if self._pipeline is None:
-            self._pipeline = Pipeline.create_from_json(jsonData)
+            try:
+                self._pipeline = Pipeline.create_from_json(jsonData)
+            except Exception as e:
+                logger.exception('%s', e)
+                raise
 
     def _handle_delete_pipeline(self, method_request: MethodRequest) -> None:
         if self._pipeline is not None:
