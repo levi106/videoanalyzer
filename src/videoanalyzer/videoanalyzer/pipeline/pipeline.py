@@ -3,7 +3,7 @@ import logging
 import threading
 from enum import Enum, auto
 from importlib import import_module
-from typing import Any, Dict, Sequence, Tuple
+from typing import Any, Dict, List, Sequence, Tuple, Type
 
 from opentelemetry import trace
 
@@ -66,6 +66,20 @@ class Pipeline:
         self._source[1].reset()
         for sink in self._sinks:
             sink[2].reset()
+
+    def get_processor(self, target_type: Type) -> List[BaseProcessor]:
+        result: List[BaseProcessor] = []
+        for _, _, processor in self._processors:
+            if isinstance(processor, target_type):
+                result.append(processor)
+        return result
+
+    def get_sink(self, target_type: Type) -> List[BaseSink]:
+        result: List[BaseSink] = []
+        for _, _, sink in self._sinks:
+            if isinstance(sink, target_type):
+                result.append(sink)
+        return result
 
     def _build_tree(self) -> None:
         logger.info('build_tree')

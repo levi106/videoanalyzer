@@ -9,6 +9,26 @@ from videoanalyzer.source._basesource import BaseSource
 from videoanalyzer.source.rtspsource import RtspSource
 
 
+class TestSink1(BaseSink):
+    def __init__(self, name):
+        self.name = name
+
+
+class TestSink2(BaseSink):
+    def __init__(self, name):
+        self.name = name
+
+
+class TestProcessor1(BaseProcessor):
+    def __init__(self, name):
+        self.name = name
+
+
+class TestProcessor2(BaseProcessor):
+    def __init__(self, name):
+        self.name = name
+
+
 def test_pipeline_create():
     source = BaseSource()
     sink = BaseSink()
@@ -273,3 +293,52 @@ def test_pipeline_create_from_json_raise_exception_if_name_does_not_exist():
     with pytest.raises(KeyError) as e:
         _ = Pipeline.create_from_json(jsonData)
     assert str(e.value) == "'name'"
+
+
+def test_pipeline_get_test_processor1():
+    source = BaseSource()
+    processor1_1 = TestProcessor1('processor1_1')
+    processor1_2 = TestProcessor1('processor1_2')
+    processor2_1 = TestProcessor2('processor2_1')
+    processors = [
+        ('processor1_1', 'source', processor1_1),
+        ('processor1_2', 'source', processor1_2),
+        ('processor2_1', 'source', processor2_1)
+    ]
+    sink1_1 = TestSink1('sink1_1')
+    sink1_2 = TestSink1('sink1_2')
+    sink2_1 = TestSink2('sink2_1')
+    sinks = [
+        ('sink1_1', 'processor1_1', sink1_1),
+        ('sink1_2', 'processor1_2', sink1_2),
+        ('sink2_1', 'processor2_1', sink2_1)
+    ]
+    pipeline = Pipeline(source=('source', source), processors=processors, sinks=sinks)
+    result = pipeline.get_processor(TestProcessor1)
+    assert len(result) == 2
+    assert result[0].name == 'processor1_1'
+    assert result[1].name == 'processor1_2'
+
+def test_pipeline_get_test_sink1():
+    source = BaseSource()
+    processor1_1 = TestProcessor1('processor1_1')
+    processor1_2 = TestProcessor1('processor1_2')
+    processor2_1 = TestProcessor2('processor2_1')
+    processors = [
+        ('processor1_1', 'source', processor1_1),
+        ('processor1_2', 'source', processor1_2),
+        ('processor2_1', 'source', processor2_1)
+    ]
+    sink1_1 = TestSink1('sink1_1')
+    sink1_2 = TestSink1('sink1_2')
+    sink2_1 = TestSink2('sink2_1')
+    sinks = [
+        ('sink1_1', 'processor1_1', sink1_1),
+        ('sink1_2', 'processor1_2', sink1_2),
+        ('sink2_1', 'processor2_1', sink2_1)
+    ]
+    pipeline = Pipeline(source=('source', source), processors=processors, sinks=sinks)
+    result = pipeline.get_sink(TestSink1)
+    assert len(result) == 2
+    assert result[0].name == 'sink1_1'
+    assert result[1].name == 'sink1_2'
