@@ -20,13 +20,10 @@
         ],
         "sinks": [
             {
-                "@type": "videoanalyzer.sink.LocalVideoSink",
-                "name": "file",
+                "@type": "videoanalyzer.sink.MetadataLogger",
+                "name": "logger",
                 "input": {
                     "nodeName": "null"
-                },
-                "parameters": {
-                    "output_dir": "/tmp/"
                 }
             }
         ]

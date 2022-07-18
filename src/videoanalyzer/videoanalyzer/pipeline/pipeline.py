@@ -1,4 +1,5 @@
 import json
+import logging
 import threading
 from enum import Enum, auto
 from importlib import import_module
@@ -11,6 +12,9 @@ from ._treebuilder import TreeBuilder
 from ..processor import BaseProcessor
 from ..sink import BaseSink
 from ..source import BaseSource
+
+
+logger = logging.getLogger(__name__)
 
 
 class State(Enum):
@@ -51,10 +55,12 @@ class Pipeline:
         self._build_tree()
 
     def start(self) -> None:
+        logger.info('start')
         self._thread = threading.Thread(target=self._run, args=())
         self._thread.start()
 
     def stop(self) -> None:
+        logger.info('stop')
         self._set_state(State.Stopped)
         self._thread.join()
         self._source[1].reset()
@@ -62,6 +68,7 @@ class Pipeline:
             sink[2].reset()
 
     def _build_tree(self) -> None:
+        logger.info('build_tree')
         with self._tracer.start_as_current_span('build_tree'):
             builder = TreeBuilder(self._source[0], self._source[1])
             for name, parent, processor in self._processors:
@@ -78,6 +85,7 @@ class Pipeline:
                 self._process(child, result[0], result[1])
 
     def _run(self) -> None:
+        logger.info('run')
         self._set_state(State.Running)
         while True:
             if not self._is_running():
@@ -86,6 +94,7 @@ class Pipeline:
             with self._tracer.start_as_current_span('process_frame'):
                 frame, props = source.read()
                 self._process(self._tree[0], frame, props)
+        logger.info('exit run')
 
     def _is_running(self) -> bool:
         self._lock.acquire()
@@ -94,6 +103,7 @@ class Pipeline:
         return is_running
 
     def _set_state(self, state: State) -> None:
+        logger.info(f'set_state: {self._state} -> {state}')
         self._lock.acquire()
         self._state = state
         self._lock.release()
@@ -111,6 +121,7 @@ class Pipeline:
         type_name = type_info[cls.TOPOLOGY_KEY_TYPE]
         constructor = _get_class(type_name)
         params = type_info.get(cls.TOPOLOGY_KEY_PARAMETERS, {})
+        logger.info(f'create_instance: {type_name}')
         if cls.TOPOLOGY_KEY_INPUT in type_info:
             upper = type_info[cls.TOPOLOGY_KEY_INPUT][cls.TOPOLOGY_KEY_NODENAME]
             return name, upper, constructor(**params)
@@ -119,6 +130,7 @@ class Pipeline:
 
     @classmethod
     def create_from_json(cls, jsonData: str) -> 'Pipeline':
+        logger.info(f'create_from_json: {jsonData}')
         topology = json.loads(jsonData)
         name = topology[cls.TOPOLOGY_KEY_NAME]
         apiVersion = topology[cls.TOPOLOGY_KEY_APIVERSION]
