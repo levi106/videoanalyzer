@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import cast
 
@@ -20,6 +21,7 @@ def main():
     provider.add_span_processor(
         SimpleSpanProcessor(ConsoleSpanExporter())
     )
+    logging.basicConfig(level=logging.INFO)
 
     source = ('camera', CameraSource(0))
     sinks = [

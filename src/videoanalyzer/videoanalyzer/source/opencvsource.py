@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Tuple
 
 import cv2
@@ -5,6 +6,9 @@ import cv2
 from opentelemetry import trace
 
 from ._basesource import BaseSource
+
+
+logger = logging.getLogger(__name__)
 
 
 class OpenCvSource(BaseSource):
@@ -16,12 +20,14 @@ class OpenCvSource(BaseSource):
         pass
 
     def read(self) -> Tuple[Any, Dict[str, Any]]:
+        logger.debug('read')
         with self._tracer.start_as_current_span('read'):
             if self._cap is None:
                 self._cap = self._create_device()
                 self._width = self._cap.get(cv2.CAP_PROP_FRAME_WIDTH)
                 self._height = self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
                 self._fps = self._cap.get(cv2.CAP_PROP_FPS)
+                logger.info(f'with: {self._width}, height: {self._height}, fps: {self._fps}')
 
             if not self._cap.isOpened():
                 pass
@@ -40,9 +46,11 @@ class OpenCvSource(BaseSource):
                 'width': int(self._width),
                 'height': int(self._height)
             }
+            logger.debug(f'pos_msec={pos_msec}, pos_frames={pos_frames}, fps={self._fps}, width={self._width}, height={self._height}')
             return frame, props
 
     def reset(self) -> None:
+        logger.info('reset')
         if self._cap is not None:
             self._cap.release()
             self._cap = None

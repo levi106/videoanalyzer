@@ -18,15 +18,17 @@
                 }
             }
         ],
-        "sinks": {
-            "@type": "videoanalyzer.sink.LocalVideoSink",
-            "name": "file",
-            "input": {
-                "nodeName": "null"
-            },
-            "parameters": {
-                "output_dir": "/tmp/"
+        "sinks": [
+            {
+                "@type": "videoanalyzer.sink.LocalVideoSink",
+                "name": "file",
+                "input": {
+                    "nodeName": "null"
+                },
+                "parameters": {
+                    "output_dir": "/tmp/"
+                }
             }
-        }
+        ]
     }
 }
