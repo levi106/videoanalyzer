@@ -5,12 +5,17 @@ name = "pypi"
 
 [packages]
 videoanalyzer = {editable = true, path = "./../videoanalyzer"}
+videoanalyzer-edge = {editable = true, path = "."}
 
 [dev-packages]
 mypy = "*"
 pytest = "*"
 flake8 = "*"
 pyright = "*"
+
+[scripts]
+lint = "flake8 --ignore=E501 --show-source ."
+format = "autopep8 -ivr ."
 
 [requires]
 python_version = "3.8"

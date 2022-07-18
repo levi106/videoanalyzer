@@ -1,10 +1,17 @@
 import asyncio
+import json
 import logging
 import threading
 from typing import Optional, cast
+
 from azure.iot.device import MethodRequest, MethodResponse
 from azure.iot.device.aio import IoTHubModuleClient
+from azure.iot.device.exceptions import ConnectionFailedError
+
+from tenacity import after_log, before_log, retry, retry_if_exception_type, wait_exponential
+
 from videoanalyzer.pipeline import Pipeline, State
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +28,11 @@ class VideoAnalyzerEdgeModule():
         self._pipeline: Optional[Pipeline] = None
         pass
 
-    def create_client(self) -> IoTHubModuleClient:
-        logger.info('create_client')
-        client = cast(IoTHubModuleClient, IoTHubModuleClient.create_from_edge_environment())
-
+    @retry(wait=wait_exponential(multiplier=1, min=3, max=30),
+           retry=retry_if_exception_type((ConnectionFailedError)),
+           before=before_log(logger, logging.INFO),
+           after=after_log(logger, logging.INFO))
+    def _connect_with_retry(self, client: IoTHubModuleClient) -> None:
         async def __message_handler(message) -> None:
             await self._message_handler(message)
 
@@ -34,10 +42,16 @@ class VideoAnalyzerEdgeModule():
         async def __twin_patch_handler(twin_patch) -> None:
             await self._twin_patch_handler(twin_patch)
 
+        client.on_message_received = __message_handler
+        client.on_method_request_received = __method_handler
+        client.on_twin_desired_properties_patch_received = __twin_patch_handler
+
+    def create_client(self) -> IoTHubModuleClient:
+        logger.info('create_client')
+        client = cast(IoTHubModuleClient, IoTHubModuleClient.create_from_edge_environment())
+
         try:
-            client.on_message_received = __message_handler
-            client.on_method_request_received = __method_handler
-            client.on_twin_desired_properties_patch_received = __twin_patch_handler
+            self._connect_with_retry(client)
         except Exception as e:
             logger.exception('%s', e)
             client.shutdown()
@@ -73,7 +87,7 @@ class VideoAnalyzerEdgeModule():
                     raise
 
     def _handle_set_pipeline(self, method_request: MethodRequest) -> None:
-        jsonData = method_request.payload
+        jsonData = json.dumps(method_request.payload)
         logger.info(f'{jsonData}')
         if self._pipeline is None:
             try:
