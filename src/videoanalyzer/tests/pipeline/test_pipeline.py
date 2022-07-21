@@ -1,3 +1,4 @@
+from typing import cast
 from unittest import mock
 
 import pytest
@@ -316,8 +317,8 @@ def test_pipeline_get_test_processor1():
     pipeline = Pipeline(source=('source', source), processors=processors, sinks=sinks)
     result = pipeline.get_processor(TestProcessor1)
     assert len(result) == 2
-    assert result[0].name == 'processor1_1'
-    assert result[1].name == 'processor1_2'
+    assert cast(TestProcessor1, result[0]).name == 'processor1_1'
+    assert cast(TestProcessor1, result[1]).name == 'processor1_2'
 
 
 def test_pipeline_get_test_sink1():
@@ -341,5 +342,5 @@ def test_pipeline_get_test_sink1():
     pipeline = Pipeline(source=('source', source), processors=processors, sinks=sinks)
     result = pipeline.get_sink(TestSink1)
     assert len(result) == 2
-    assert result[0].name == 'sink1_1'
-    assert result[1].name == 'sink1_2'
+    assert cast(TestSink1, result[0]).name == 'sink1_1'
+    assert cast(TestSink1, result[1]).name == 'sink1_2'
