@@ -19,9 +19,9 @@ def main():
     trace.set_tracer_provider(TracerProvider())
     provider: TracerProvider = cast(
         TracerProvider, trace.get_tracer_provider())
-#    provider.add_span_processor(
-#        SimpleSpanProcessor(ConsoleSpanExporter())
-#    )
+    provider.add_span_processor(
+        SimpleSpanProcessor(ConsoleSpanExporter())
+    )
     logging.basicConfig(level=logging.DEBUG)
 
     source = ('camera', CameraSource(0))
