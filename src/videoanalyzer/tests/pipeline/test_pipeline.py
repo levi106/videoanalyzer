@@ -319,6 +319,7 @@ def test_pipeline_get_test_processor1():
     assert result[0].name == 'processor1_1'
     assert result[1].name == 'processor1_2'
 
+
 def test_pipeline_get_test_sink1():
     source = BaseSource()
     processor1_1 = TestProcessor1('processor1_1')
