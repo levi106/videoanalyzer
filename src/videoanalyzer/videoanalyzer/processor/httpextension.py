@@ -1,7 +1,7 @@
 import json
+import logging
 import time
 from io import BytesIO
-from logging import getLogger
 from typing import Any, Dict, Optional, Tuple
 
 import cv2
@@ -13,10 +13,12 @@ import requests
 from ._baseprocessor import BaseProcessor
 
 
+logger = logging.getLogger(__name__)
+
+
 class HttpExtension(BaseProcessor):
     def __init__(self, url: str, max_samples_per_sec: int = -1):
         self._tracer = trace.get_tracer(__name__)
-        self._logger = getLogger(__name__)
         self._url = url
         self._max_samples_per_sec = max_samples_per_sec
         self._start = 0.
@@ -34,7 +36,7 @@ class HttpExtension(BaseProcessor):
                         self._url, data={'data': json.dumps(props)}, files=files)
                     props.update(r.json())
                 except Exception as e:
-                    self._logger.exception(e)
+                    logger.exception(e)
                 self._start = self._end
 
             return frame, props

@@ -32,5 +32,8 @@ class IoTHubMessageSink(BaseSink):
             logger.error('IoTHubModuleClient is None')
             return
 
-        self._client.send_message_to_output(
-            json.dumps(props), self._output_name)
+        try:
+            self._client.send_message_to_output(
+                json.dumps(props), self._output_name)
+        except Exception as e:
+            logger.exception(e)

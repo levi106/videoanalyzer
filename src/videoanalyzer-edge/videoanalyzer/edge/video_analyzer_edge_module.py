@@ -1,11 +1,11 @@
-import asyncio
 import json
 import logging
 import threading
+import time
 from typing import Optional, cast
 
 from azure.iot.device import MethodRequest, MethodResponse
-from azure.iot.device.aio import IoTHubModuleClient
+from azure.iot.device import IoTHubModuleClient
 from azure.iot.device.exceptions import ConnectionFailedError
 
 from tenacity import after_log, before_log, retry, retry_if_exception_type, wait_exponential
@@ -35,14 +35,14 @@ class VideoAnalyzerEdgeModule():
            before=before_log(logger, logging.INFO),
            after=after_log(logger, logging.INFO))
     def _connect_with_retry(self, client: IoTHubModuleClient) -> None:
-        async def __message_handler(message) -> None:
-            await self._message_handler(message)
+        def __message_handler(message) -> None:
+            self._message_handler(message)
 
-        async def __method_handler(method_request) -> None:
-            await self._method_handler(method_request)
+        def __method_handler(method_request) -> None:
+            self._method_handler(method_request)
 
-        async def __twin_patch_handler(twin_patch) -> None:
-            await self._twin_patch_handler(twin_patch)
+        def __twin_patch_handler(twin_patch) -> None:
+            self._twin_patch_handler(twin_patch)
 
         client.on_message_received = __message_handler
         client.on_method_request_received = __method_handler
@@ -61,12 +61,12 @@ class VideoAnalyzerEdgeModule():
 
         return client
 
-    async def run(self) -> None:
+    def run(self) -> None:
         logger.info('run')
         while not self._stop_event.is_set():
-            await asyncio.sleep(1000)
+            time.sleep(1000)
 
-    async def _message_handler(self, message) -> None:
+    def _message_handler(self, message) -> None:
         logger.info('message_handler')
         pass
 
@@ -108,7 +108,7 @@ class VideoAnalyzerEdgeModule():
             if self._pipeline.state is State.Stopped:
                 self._pipeline = None
 
-    async def _method_handler(self, method_request: MethodRequest) -> None:
+    def _method_handler(self, method_request: MethodRequest) -> None:
         logger.info(f'method_handler: {method_request.name}')
         if method_request.name == self.METHOD_NAME_ACTIVATE:
             self._handle_activate(method_request)
@@ -120,18 +120,18 @@ class VideoAnalyzerEdgeModule():
             self._handle_delete_pipeline(method_request)
         else:
             method_response = MethodResponse.create_from_method_request(method_request, 400, None)
-            await self._client.send_method_response(method_response)
+            self._client.send_method_response(method_response)
             return
         method_response = MethodResponse.create_from_method_request(method_request, 200, None)
-        await self._client.send_method_response(method_response)
+        self._client.send_method_response(method_response)
 
-    async def _twin_patch_handler(self, twin_patch) -> None:
+    def _twin_patch_handler(self, twin_patch) -> None:
         logger.info('twin_patch_handler')
 
     def terminate(self) -> None:
         logger.info('terminate')
         self._stop_event.set()
 
-    async def shutdown(self) -> None:
+    def shutdown(self) -> None:
         logger.info('shutdown')
-        await self._client.shutdown()
+        self._client.shutdown()

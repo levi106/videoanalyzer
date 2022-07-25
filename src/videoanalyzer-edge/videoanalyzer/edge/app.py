@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import signal
 
@@ -14,15 +13,12 @@ def main() -> None:
 
     signal.signal(signal.SIGTERM, module_termination_handler_)
 
-    loop = asyncio.get_event_loop()
-
     try:
-        loop.run_until_complete(module.run())
+        module.run()
     except Exception:
         raise
     finally:
-        loop.run_until_complete(module.shutdown())
-        loop.close()
+        module.shutdown()
 
 
 if __name__ == "__main__":

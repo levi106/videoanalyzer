@@ -57,6 +57,7 @@ class Pipeline:
     def start(self) -> None:
         logger.info('start')
         self._thread = threading.Thread(target=self._run, args=())
+        self._thread.daemon = True
         self._thread.start()
 
     def stop(self) -> None:
