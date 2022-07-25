@@ -94,7 +94,7 @@ class VideoAnalyzerEdgeModule():
         if self._pipeline is None:
             try:
                 self._pipeline = Pipeline.create_from_json(jsonData)
-                iotHubSinks = self._pipeline.getsink(IoTHubMessageSink)
+                iotHubSinks = self._pipeline.get_sink(IoTHubMessageSink)
                 for sink in iotHubSinks:
                     iotHubSink = cast(IoTHubMessageSink, sink)
                     iotHubSink.client = self._client

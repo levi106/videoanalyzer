@@ -20,7 +20,7 @@
         ],
         "sinks": [
             {
-                "@type": "videoanalyzer.sink.IotHubMessageSink",
+                "@type": "videoanalyzer.sink.IoTHubMessageSink",
                 "name": "iothub",
                 "input": {
                     "nodeName": "null"
