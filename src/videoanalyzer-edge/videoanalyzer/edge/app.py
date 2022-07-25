@@ -1,11 +1,13 @@
 import logging
+import os
 import signal
 
 from .video_analyzer_edge_module import VideoAnalyzerEdgeModule
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO)
+    LOGLEVEL = os.environ.get('LOGLEVEL', 'INFO').upper()
+    logging.basicConfig(level=LOGLEVEL)
     module = VideoAnalyzerEdgeModule()
 
     def module_termination_handler_(signal, frame) -> None:
