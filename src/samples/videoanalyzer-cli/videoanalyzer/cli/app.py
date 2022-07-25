@@ -3,6 +3,7 @@ from os import path
 import pathlib
 from typing import Any, Dict, Optional
 import urllib.request
+import argparse
 
 from azure.iot.hub import IoTHubRegistryManager
 from azure.iot.hub.models import CloudToDeviceMethod
@@ -78,9 +79,13 @@ class LivePipelineManager:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--filename', default='operations.json')
+    args = parser.parse_args()
+
     manager = LivePipelineManager()
 
-    operations_data_json = pathlib.Path('operations.json').read_text()
+    operations_data_json = pathlib.Path(args.filename).read_text()
     operations_data = json.loads(operations_data_json)
 
     for operation in operations_data['operations']:

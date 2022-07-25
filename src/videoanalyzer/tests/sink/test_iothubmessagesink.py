@@ -14,7 +14,8 @@ def test_write(mock_iotHubModuleClient):
     props = {'prop1': 'value1', 'prop2': 'value2'}
 
     client = IoTHubModuleClient()
-    sink = IoTHubMessageSink(client=client, output_name=output_name)
+    sink = IoTHubMessageSink(output_name=output_name)
+    sink.client = client
     sink.write(frame=None, props=props)
 
     instance.send_message_to_output.assert_called_once_with(

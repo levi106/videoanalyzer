@@ -12,6 +12,8 @@ from tenacity import after_log, before_log, retry, retry_if_exception_type, wait
 
 from videoanalyzer.pipeline import Pipeline, State
 
+from videoanalyzer.sink import IoTHubMessageSink
+
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +94,11 @@ class VideoAnalyzerEdgeModule():
         if self._pipeline is None:
             try:
                 self._pipeline = Pipeline.create_from_json(jsonData)
+                iotHubSinks = self._pipeline.getsink(IoTHubMessageSink)
+                for sink in iotHubSinks:
+                    iotHubSink = cast(IoTHubMessageSink, sink)
+                    iotHubSink.client = self._client
+
             except Exception as e:
                 logger.exception('%s', e)
                 raise
