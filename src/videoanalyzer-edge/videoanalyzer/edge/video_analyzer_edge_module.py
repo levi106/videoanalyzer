@@ -12,6 +12,8 @@ from tenacity import after_log, before_log, retry, retry_if_exception_type, wait
 
 from videoanalyzer.pipeline import Pipeline, State
 
+from videoanalyzer.processor import IoTHubMessageProcessor
+
 from videoanalyzer.sink import IoTHubMessageSink
 
 
@@ -23,6 +25,7 @@ class VideoAnalyzerEdgeModule():
     METHOD_NAME_DEACTIVATE = "deactivate"
     METHOD_NAME_SETPIPELINE = "setPipeline"
     METHOD_NAME_DELETEPIPELINE = "deletePipeline"
+    METHOD_NAME_UPDATEMETADATA = "updatemetadata"
 
     def __init__(self):
         self._client = self.create_client()
@@ -107,6 +110,13 @@ class VideoAnalyzerEdgeModule():
         if self._pipeline is not None:
             if self._pipeline.state is State.Stopped:
                 self._pipeline = None
+
+    def _handle_update_metadata(self, method_request: MethodRequest) -> None:
+        if self._pipeline is not None:
+            iotHubProcessors = self._pipelines.get_processor(IoTHubMessageProcessor)
+            for processor in iotHubProcessors:
+                iotHubProcessor = cast(IoTHubMessageProcessor, processor)
+                iotHubProcessor.update_metadata(method_request.payload)
 
     def _method_handler(self, method_request: MethodRequest) -> None:
         logger.info(f'method_handler: {method_request.name}')

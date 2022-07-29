@@ -10,6 +10,11 @@ from videoanalyzer.source._basesource import BaseSource
 from videoanalyzer.source.rtspsource import RtspSource
 
 
+class TestSource1(BaseSource):
+    def __init__(self, name):
+        self.name = name
+
+
 class TestSink1(BaseSink):
     def __init__(self, name):
         self.name = name
@@ -344,3 +349,26 @@ def test_pipeline_get_test_sink1():
     assert len(result) == 2
     assert cast(TestSink1, result[0]).name == 'sink1_1'
     assert cast(TestSink1, result[1]).name == 'sink1_2'
+
+
+def test_pipeline_get_test_source1():
+    source = TestSource1('source_1')
+    processor1_1 = TestProcessor1('processor1_1')
+    processor1_2 = TestProcessor1('processor1_2')
+    processor2_1 = TestProcessor2('processor2_1')
+    processors = [
+        ('processor1_1', 'source', processor1_1),
+        ('processor1_2', 'source', processor1_2),
+        ('processor2_1', 'source', processor2_1)
+    ]
+    sink1_1 = TestSink1('sink1_1')
+    sink1_2 = TestSink1('sink1_2')
+    sink2_1 = TestSink2('sink2_1')
+    sinks = [
+        ('sink1_1', 'processor1_1', sink1_1),
+        ('sink1_2', 'processor1_2', sink1_2),
+        ('sink2_1', 'processor2_1', sink2_1)
+    ]
+    pipeline = Pipeline(source=('source', source), processors=processors, sinks=sinks)
+    result = pipeline.get_source()
+    assert cast(TestSource1, result).name == 'source_1'

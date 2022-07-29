@@ -68,6 +68,9 @@ class Pipeline:
         for sink in self._sinks:
             sink[2].reset()
 
+    def get_source(self) -> BaseSource:
+        return self._source[1]
+
     def get_processor(self, target_type: Type) -> List[BaseProcessor]:
         result: List[BaseProcessor] = []
         for _, _, processor in self._processors:
